@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using CarRent.Common.Domain;
 using CarRent.Feature.Cars.Domain;
 using FastEndpoints;
 
@@ -9,10 +10,12 @@ namespace CarRent.Feature.Cars.Api
 {
     public class CreateCarEndpoint : Endpoint<CarRequest, CarResponse>
     {
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ICarRepository _carRepository;
 
-        public CreateCarEndpoint(ICarRepository carRepository)
+        public CreateCarEndpoint(IUnitOfWork unitOfWork, ICarRepository carRepository)
         {
+            _unitOfWork = unitOfWork;
             _carRepository = carRepository;
         }
 
@@ -28,7 +31,13 @@ namespace CarRent.Feature.Cars.Api
 
             _carRepository.Add(car);
 
-            await SendCreatedAtAsync<GetCarByIdEndpoint>("/cars/{id}", new CarResponse
+            /*
+             * macht man zur abstraktion, falls man noch weitere repositories hätte,
+             * damit man auf einmal alle Änderungen speichern können
+             */
+            _unitOfWork.CommitChanges();
+
+            await SendCreatedAtAsync<GetCarByIdEndpoint>(null, new CarResponse
             {
                 Id = car.Id,
                 Name = req.Name

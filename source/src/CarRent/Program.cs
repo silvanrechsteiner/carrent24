@@ -1,3 +1,4 @@
+﻿using CarRent.Common.Domain;
 using CarRent.Feature.Cars.Domain;
 using CarRent.Feature.Cars.Infrastructure;
 using CarRent.Persistance;
@@ -13,8 +14,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbContext<CarRentDbContext>(options => {
     options.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=carrent;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
 });
-builder.Services.AddScoped<ICarRepository, CarRepository>();
+builder.Services.AddScoped<IUnitOfWork>(serviceProvider => serviceProvider.GetRequiredService<CarRentDbContext>());
 builder.Services.AddFastEndpoints().SwaggerDocument();
+builder.Services.AddScoped<ICarRepository, CarRepository>();
 
 var app = builder.Build();
 app.UseFastEndpoints().UseSwaggerGen();
