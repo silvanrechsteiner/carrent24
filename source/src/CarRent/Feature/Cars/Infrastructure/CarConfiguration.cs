@@ -12,6 +12,13 @@ namespace CarRent.Feature.Cars.Infrastructure
 
             builder.Property(x => x.Name)
                 .HasMaxLength(256);
+
+            // add demo data
+            builder.HasData(
+                new Car() { Name = "Car 1"},
+                new Car() { Name = "Car 2"},
+                new Car() { Name = "Car 3"}
+            );
         }
     }
 }
